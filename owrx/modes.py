@@ -123,7 +123,7 @@ class Modes(object):
         AnalogMode("cw", "CW", bandpass=Bandpass(700, 900)),
         AnalogMode("sam", "SAM", bandpass=Bandpass(-4000, 4000)),
         AnalogMode("dmr", "DMR", bandpass=Bandpass(-6250, 6250), requirements=["digital_voice_digiham"], squelch=False),
-		AnalogMode("m17", "DMR+", bandpass=Bandpass(-4000, 4000), requirements=["digital_voice_m17"], squelch=False),
+	AnalogMode("m17", "DMR+", bandpass=Bandpass(-4000, 4000), requirements=["digital_voice_m17"], squelch=False),
 
         DigitalMode("bpsk31", "BPSK31", underlying=["usb"]),
         DigitalMode("bpsk63", "BPSK63", underlying=["usb"]),
