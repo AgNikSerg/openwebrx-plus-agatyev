@@ -25,20 +25,51 @@ fi
 sudo apt-get update
 sudo apt-get install -y curl git  
 
-if [[ "$DISTRO" == "debian" ]]; then
-  echo "Обнаружен Debian. Используется репозиторий Docker для Debian."
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh --mirror AzureChinaCloud
-  rm get-docker.sh
-elif [[ "$DISTRO" == "ubuntu" ]]; then
-  echo "Обнаружен Ubuntu. Используется репозиторий Docker для Ubuntu."
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh
-  rm get-docker.sh
-else
-  echo -e "${RED}Ошибка: Неподдерживаемый дистрибутив (${DISTRO}).${NC}"
-  exit 1
-fi
+case "$DISTRO" in
+  debian)
+    echo "Обнаружен Debian. Используется репозиторий Docker для Debian."
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh --mirror AzureChinaCloud
+    rm get-docker.sh
+    ;;
+  ubuntu)
+    echo "Обнаружен Ubuntu. Используется репозиторий Docker для Ubuntu."
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo sh get-docker.sh
+    rm get-docker.sh
+    ;;
+  linuxmint)
+    echo "Обнаружен Linux Mint. Используется базовая версия Ubuntu для установки Docker."
+    
+    echo "Установка зависимостей Docker..."
+    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
+
+    # Импорт GPG ключа Docker
+    echo "Импорт GPG ключа Docker..."
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    echo "Добавление репозитория Docker..."
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$UBUNTU_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    echo "Обновление списка пакетов..."
+    sudo apt-get update
+
+    echo "Установка Docker..."
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    echo "Добавление текущего пользователя в группу docker..."
+    sudo usermod -aG docker $USER
+    ;;
+  *)
+    echo -e "${RED}Ошибка: Неподдерживаемый дистрибутив (${DISTRO}).${NC}"
+    exit 1
+    ;;
+esac
 
 echo "Настройка зеркал Docker Hub..."
 cat << EOF | sudo tee /etc/docker/daemon.json > /dev/null
