@@ -12,7 +12,7 @@ if ! command -v apt-get &> /dev/null; then
 fi
 
 sudo apt-get update
-sudo apt-get install -y curl 
+sudo apt-get install -y curl git  
 
 echo "Загрузка и установка Docker через официальный скрипт..."
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -55,3 +55,23 @@ else
   echo -e "${RED}Ошибка: Служба Docker не запущена.${NC}"
   exit 1
 fi
+
+echo "Клонирование репозитория openwebrx-plus-agatyev..."
+git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git || (
+  echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"
+  exit 1
+)
+
+echo "Переход в директорию openwebrx-plus-agatyev..."
+cd openwebrx-plus-agatyev || (
+  echo -e "${RED}Ошибка: Не удалось перейти в директорию openwebrx-plus-agatyev.${NC}"
+  exit 1
+)
+
+echo "Запуск Docker Compose..."
+sudo docker compose up -d || (
+  echo -e "${RED}Ошибка: Не удалось запустить Docker Compose.${NC}"
+  exit 1
+)
+
+echo -e "${GREEN}Docker Compose успешно запущен в фоновом режиме.${NC}"
