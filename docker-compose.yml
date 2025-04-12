@@ -12,7 +12,7 @@ services:
       FORWARD_LOCALPORT_1234: 5678
       OPENWEBRX_ADMIN_USER: admin
       OPENWEBRX_ADMIN_PASSWORD: admin
-      # HEALTHCHECK_USB_0BDA_2838: 2
+      HEALTHCHECK_USB_0BDA_2838: 1
       # HEALTHCHECK_USB_0BDA_2832: 1
       # HEALTHCHECK_USB_1DF7_3000: 1
     devices:
@@ -24,11 +24,11 @@ services:
 
 # if you want your container to restart automatically if the HEALTHCHECK fails
 # (see here: https://stackoverflow.com/a/48538213/420585)
-  # autoheal:
-  #   restart: always
-  #   image: willfarrell/autoheal
-  #   environment:
-  #     - AUTOHEAL_CONTAINER_LABEL=all
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 

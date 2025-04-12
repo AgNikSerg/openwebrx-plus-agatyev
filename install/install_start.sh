@@ -5,6 +5,17 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'  
 
+get_distro() {
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    echo "$ID"
+  else
+    echo "unknown"
+  fi
+}
+
+DISTRO=$(get_distro)
+
 echo "Обновление системы и установка базовых инструментов..."
 if ! command -v apt-get &> /dev/null; then
   echo -e "${RED}Ошибка: Скрипт поддерживает только системы на основе Debian/Ubuntu.${NC}"
@@ -14,10 +25,20 @@ fi
 sudo apt-get update
 sudo apt-get install -y curl git  
 
-echo "Загрузка и установка Docker через официальный скрипт..."
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-rm get-docker.sh  
+if [[ "$DISTRO" == "debian" ]]; then
+  echo "Обнаружен Debian. Используется репозиторий Docker для Debian."
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh --mirror AzureChinaCloud
+  rm get-docker.sh
+elif [[ "$DISTRO" == "ubuntu" ]]; then
+  echo "Обнаружен Ubuntu. Используется репозиторий Docker для Ubuntu."
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+  rm get-docker.sh
+else
+  echo -e "${RED}Ошибка: Неподдерживаемый дистрибутив (${DISTRO}).${NC}"
+  exit 1
+fi
 
 echo "Настройка зеркал Docker Hub..."
 cat << EOF | sudo tee /etc/docker/daemon.json > /dev/null
@@ -53,6 +74,24 @@ if systemctl is-active --quiet docker; then
   echo -e "${GREEN}Служба Docker запущена.${NC}"
 else
   echo -e "${RED}Ошибка: Служба Docker не запущена.${NC}"
+  exit 1
+fi
+
+BLACKLIST_FILE="/etc/modprobe.d/owrx-blacklist.conf"
+echo "Создание файла блокировки модулей ($BLACKLIST_FILE)..."
+cat > "$BLACKLIST_FILE" << _EOF_
+blacklist dvb_usb_rtl28xxu
+blacklist sdr_msi3101
+blacklist msi001
+blacklist msi2500
+blacklist hackrf
+_EOF_
+
+if [ -f "$BLACKLIST_FILE" ]; then
+  echo -e "${GREEN}OK: Файл блокировки модулей создан:${NC}"
+  cat "$BLACKLIST_FILE"
+else
+  echo -e "${RED}Ошибка: Файл блокировки модулей (${BLACKLIST_FILE}) не найден.${NC}"
   exit 1
 fi
 
