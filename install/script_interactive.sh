@@ -9,8 +9,9 @@ NC='\033[0m'
 REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
 if [ ! -f "/usr/local/bin/sdr" ]; then
-  echo -e "${YELLOW}Создание символической ссылки для команды 'sdr'...${NC}"
-  sudo ln -sf "$(pwd)/install_sdr.sh" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать символическую ссылку.${NC}"; exit 1; }
+  echo -e "${YELLOW}Создание исполняемой копии скрипта...${NC}"
+  sudo cp "$0" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать копию скрипта.${NC}"; exit 1; }
+  sudo chmod +x /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
   echo -e "${GREEN}Теперь вы можете запускать скрипт командой 'sdr'.${NC}"
 fi
 
