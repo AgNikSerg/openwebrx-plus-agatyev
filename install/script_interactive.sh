@@ -194,7 +194,7 @@ show_menu() {
 
 while true; do
   show_menu
-  read -r choice
+  read -r choice < /dev/tty
 
   case $choice in
     1)
