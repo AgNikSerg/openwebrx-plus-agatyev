@@ -8,11 +8,17 @@ NC='\033[0m'
 
 REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
-if [ ! -f "/usr/local/bin/sdr" ]; then
-  echo -e "${YELLOW}Создание исполняемой копии скрипта...${NC}"
-  sudo cp "$0" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать копию скрипта.${NC}"; exit 1; }
-  sudo chmod +x /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
-  echo -e "${GREEN}Теперь вы можете запускать скрипт командой 'sdr'.${NC}"
+if [ "$(basename "$0")" = "bash" ]; then
+  echo -e "${YELLOW}Скрипт запущен через curl. Скачиваем его на диск...${NC}"
+  SCRIPT_URL="https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh"
+  SCRIPT_PATH="/usr/local/bin/sdr"
+
+  sudo curl -sSL "$SCRIPT_URL" -o "$SCRIPT_PATH" || { echo -e "${RED}Ошибка: Не удалось скачать скрипт.${NC}"; exit 1; }
+
+  sudo chmod +x "$SCRIPT_PATH" || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
+
+  echo -e "${GREEN}Скрипт успешно установлен. Запускаем его...${NC}"
+  exec "$SCRIPT_PATH"
 fi
 
 
