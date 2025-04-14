@@ -146,7 +146,6 @@ start_web_sdr() {
     return
   fi
 
-# Проверяем запущенные контейнеры через Docker
 if sudo docker ps | grep -q "openwebrx"; then
   echo -e "${YELLOW}WEB SDR уже запущен:${NC}"
   sudo docker ps --filter name=openwebrx

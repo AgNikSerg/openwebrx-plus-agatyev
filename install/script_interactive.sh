@@ -41,8 +41,12 @@ install_web_sdr() {
   echo "- Клонирование репозитория OpenWebRX"
   echo "- Создание необходимых директорий"
 
-  if ! confirm_action; then
-    return
+  if [[ "$(basename "$0")" != "bash" ]]; then
+    read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
+    if [[ "$confirm" != "yes" ]]; then
+      echo -e "${YELLOW}Действие отменено.${NC}"
+      return
+    fi
   fi
 
   sudo apt-get update || { echo -e "${RED}Ошибка: Не удалось обновить список пакетов.${NC}"; return 1; }
@@ -112,9 +116,13 @@ uninstall_web_sdr() {
   echo "- Директории OpenWebRX"
   echo "- Репозиторий OpenWebRX"
 
-  if ! confirm_action; then
+if [[ "$(basename "$0")" != "bash" ]]; then
+  read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
+  if [[ "$confirm" != "yes" ]]; then
+    echo -e "${YELLOW}Действие отменено.${NC}"
     return
   fi
+fi
 
   echo -e "${YELLOW}Остановка Docker Compose...${NC}"
   sudo docker compose down || echo -e "${YELLOW}Предупреждение: Docker Compose не был запущен.${NC}"
