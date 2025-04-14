@@ -142,6 +142,13 @@ start_web_sdr() {
     return
   fi
 
+# Проверяем запущенные контейнеры через Docker
+if sudo docker ps | grep -q "openwebrx"; then
+  echo -e "${YELLOW}WEB SDR уже запущен:${NC}"
+  sudo docker ps --filter name=openwebrx
+  return
+fi
+
   if [ ! -d "$REPO_DIR" ]; then
     echo -e "${RED}Ошибка: Репозиторий OpenWebRX не найден.${NC}"
     echo -e "${YELLOW}Пожалуйста, выполните шаг 1 для клонирования репозитория.${NC}"
