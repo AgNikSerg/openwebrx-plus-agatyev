@@ -6,18 +6,21 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-REPO_DIR="$HOME/openwebrx-plus-agatyev"
+INSTALL_PATH="/usr/local/bin/sdr"
 
-if [ ! -f "/usr/local/bin/sdr" ]; then
-  echo -e "${YELLOW}Создание символической ссылки для команды 'sdr'...${NC}"
-  SCRIPT_PATH=$(realpath "$0") 
-  sudo ln -sf "$SCRIPT_PATH" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать символическую ссылку.${NC}"; exit 1; }
-  echo -e "${GREEN}Теперь вы можете запускать скрипт командой 'sdr'.${NC}"
+if [[ "$(basename "$0")" == "bash" ]]; then
+  echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
+  
+  SCRIPT_URL="https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh"
 
-  sed -i '1,/^# Конец блока создания ссылки$/d' "$SCRIPT_PATH"
+  sudo curl -sSL "$SCRIPT_URL" -o "$INSTALL_PATH" || { echo -e "${RED}Ошибка: Не удалось скачать скрипт.${NC}"; exit 1; }
+
+  sudo chmod +x "$INSTALL_PATH" || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
+
+  echo -e "${GREEN}Скрипт успешно установлен. Запускаем его...${NC}"
+  exec "$INSTALL_PATH"
 fi
 
-# Конец блока создания ссылки
 
 confirm_action() {
   read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
