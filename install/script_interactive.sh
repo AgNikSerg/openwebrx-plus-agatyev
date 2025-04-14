@@ -6,7 +6,8 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-REPO_DIR="/opt/openwebrx-plus-agatyev"
+INSTALL_PATH="/usr/local/bin/sdr"
+REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
 if [[ "$(basename "$0")" == "bash" ]]; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
@@ -87,14 +88,20 @@ blacklist msi2500
 blacklist hackrf
 _EOF_
 
-echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
+  echo -e "${YELLOW}Создание директорий для OpenWebRX...${NC}"
+  sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
 
-sudo mkdir -p "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось создать директорию для репозитория.${NC}"; return 1; }
+  echo -e "${YELLOW}Проверка репозитория OpenWebRX...${NC}"
+  if [ -d "$REPO_DIR" ]; then
+    echo -e "${YELLOW}Репозиторий уже существует. Обновляю...${NC}"
+    cd "$REPO_DIR" && git pull || { echo -e "${RED}Ошибка обновления репозитория.${NC}"; return 1; }
+  else
+    git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
+      echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
+  fi
 
-git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
-
-cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
-echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
+  echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
+}
 }
 
 uninstall_web_sdr() {
@@ -146,7 +153,6 @@ start_web_sdr() {
     return
   fi
 
-# Проверяем запущенные контейнеры через Docker
 if sudo docker ps | grep -q "openwebrx"; then
   echo -e "${YELLOW}WEB SDR уже запущен:${NC}"
   sudo docker ps --filter name=openwebrx
