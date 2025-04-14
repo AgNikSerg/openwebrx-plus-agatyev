@@ -102,7 +102,6 @@ _EOF_
 
   echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
 }
-}
 
 uninstall_web_sdr() {
   echo -e "${GREEN}=== Удаление всего для WEB SDR ===${NC}"
