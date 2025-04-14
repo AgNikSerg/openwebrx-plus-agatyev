@@ -7,6 +7,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 INSTALL_PATH="/usr/local/bin/sdr"
+REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
 if [[ "$(basename "$0")" == "bash" ]]; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
