@@ -6,8 +6,7 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-INSTALL_PATH="/usr/local/bin/sdr"
-REPO_DIR="$HOME/openwebrx-plus-agatyev"
+REPO_DIR="/opt/openwebrx-plus-agatyev"
 
 if [[ "$(basename "$0")" == "bash" ]]; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
@@ -88,13 +87,14 @@ blacklist msi2500
 blacklist hackrf
 _EOF_
 
-  echo -e "${YELLOW}Создание директорий для OpenWebRX...${NC}"
-  sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
+echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
 
-  echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
-  git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
-  cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
-  echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
+sudo mkdir -p "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось создать директорию для репозитория.${NC}"; return 1; }
+
+git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
+
+cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
+echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
 }
 
 uninstall_web_sdr() {
