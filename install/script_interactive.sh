@@ -10,14 +10,10 @@ REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
 if [ ! -f "/usr/local/bin/sdr" ]; then
   echo -e "${YELLOW}Создание символической ссылки для команды 'sdr'...${NC}"
-  SCRIPT_PATH=$(realpath "$0") 
-  sudo ln -sf "$SCRIPT_PATH" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать символическую ссылку.${NC}"; exit 1; }
+  sudo ln -sf "$(pwd)/install_sdr.sh" /usr/local/bin/sdr || { echo -e "${RED}Ошибка: Не удалось создать символическую ссылку.${NC}"; exit 1; }
   echo -e "${GREEN}Теперь вы можете запускать скрипт командой 'sdr'.${NC}"
-
-  sed -i '1,/^# Конец блока создания ссылки$/d' "$SCRIPT_PATH"
 fi
 
-# Конец блока создания ссылки
 
 confirm_action() {
   read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
