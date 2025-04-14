@@ -175,6 +175,7 @@ fi
   sudo docker compose up -d || { echo -e "${RED}Ошибка: Не удалось запустить Docker Compose.${NC}"; return; }
 
   echo -e "${GREEN}WEB SDR успешно запущен.${NC}"
+}
 
 stop_web_sdr() {
   echo -e "${GREEN}=== Остановка WEB SDR ===${NC}"
