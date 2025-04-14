@@ -9,7 +9,12 @@ NC='\033[0m'
 INSTALL_PATH="/usr/local/bin/sdr"
 REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
+IS_CURL_MODE=false
 if [[ "$(basename "$0")" == "bash" ]]; then
+  IS_CURL_MODE=true
+fi
+
+if $IS_CURL_MODE; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
   
   SCRIPT_URL="https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh"
@@ -41,7 +46,7 @@ install_web_sdr() {
   echo "- Клонирование репозитория OpenWebRX"
   echo "- Создание необходимых директорий"
 
-  if [[ -t 0 ]]; then
+  if ! $IS_CURL_MODE; then
     read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
     if [[ "$confirm" != "yes" ]]; then
       echo -e "${YELLOW}Действие отменено.${NC}"
@@ -116,14 +121,13 @@ uninstall_web_sdr() {
   echo "- Директории OpenWebRX"
   echo "- Репозиторий OpenWebRX"
 
-  if [[ -t 0 ]]; then
+  if ! $IS_CURL_MODE; then
     read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
     if [[ "$confirm" != "yes" ]]; then
       echo -e "${YELLOW}Действие отменено.${NC}"
       return
     fi
   fi
-
   echo -e "${YELLOW}Остановка Docker Compose...${NC}"
   sudo docker compose down || echo -e "${YELLOW}Предупреждение: Docker Compose не был запущен.${NC}"
 
