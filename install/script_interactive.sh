@@ -101,7 +101,7 @@ _EOF_
   fi
 
   echo -e "${YELLOW}Клонирую репозиторий в '$REPO_DIR'...${NC}"
-  sudo git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
+  sudo -H git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
     echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; 
     return 1; 
   }
