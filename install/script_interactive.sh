@@ -9,12 +9,11 @@ NC='\033[0m'
 INSTALL_PATH="/usr/local/bin/sdr"
 REPO_DIR="$HOME/openwebrx-plus-agatyev"
 
-IS_CURL_MODE=false
-if [[ "$(basename "$0")" == "bash" ]]; then
-  IS_CURL_MODE=true
-fi
+is_curl_pipe_bash() {
+  [[ "$(basename "$0")" == "bash" ]]
+}
 
-if $IS_CURL_MODE; then
+if is_curl_pipe_bash; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
   
   SCRIPT_URL="https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh"
@@ -24,7 +23,8 @@ if $IS_CURL_MODE; then
   sudo chmod +x "$INSTALL_PATH" || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
 
   echo -e "${GREEN}Скрипт успешно установлен. Запускаем его...${NC}"
-  exec "$INSTALL_PATH"
+
+  exec "$INSTALL_PATH" "$@"
 fi
 
 
@@ -46,12 +46,8 @@ install_web_sdr() {
   echo "- Клонирование репозитория OpenWebRX"
   echo "- Создание необходимых директорий"
 
-  if ! $IS_CURL_MODE; then
-    read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
-    if [[ "$confirm" != "yes" ]]; then
-      echo -e "${YELLOW}Действие отменено.${NC}"
-      return
-    fi
+  if ! confirm_action; then
+    return
   fi
 
   sudo apt-get update || { echo -e "${RED}Ошибка: Не удалось обновить список пакетов.${NC}"; return 1; }
@@ -100,15 +96,9 @@ _EOF_
   echo -e "${YELLOW}Создание директорий для OpenWebRX...${NC}"
   sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
 
-  echo -e "${YELLOW}Проверка репозитория OpenWebRX...${NC}"
-  if [ -d "$REPO_DIR" ]; then
-    echo -e "${YELLOW}Репозиторий уже существует. Обновляю...${NC}"
-    cd "$REPO_DIR" && git pull || { echo -e "${RED}Ошибка обновления репозитория.${NC}"; return 1; }
-  else
-    git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
-      echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
-  fi
-
+  echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
+  git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
+  cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
   echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
 }
 
@@ -121,13 +111,10 @@ uninstall_web_sdr() {
   echo "- Директории OpenWebRX"
   echo "- Репозиторий OpenWebRX"
 
-  if ! $IS_CURL_MODE; then
-    read -p "Вы уверены, что хотите продолжить? (yes/no): " confirm
-    if [[ "$confirm" != "yes" ]]; then
-      echo -e "${YELLOW}Действие отменено.${NC}"
-      return
-    fi
+  if ! confirm_action; then
+    return
   fi
+
   echo -e "${YELLOW}Остановка Docker Compose...${NC}"
   sudo docker compose down || echo -e "${YELLOW}Предупреждение: Docker Compose не был запущен.${NC}"
 
