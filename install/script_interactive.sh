@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 INSTALL_PATH="/usr/local/bin/sdr"
-REPO_DIR="$HOME/openwebrx-plus-agatyev"
+REPO_DIR="/opt/openwebrx-plus-agatyev"
 
 if [[ "$(basename "$0")" == "bash" ]]; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
@@ -44,10 +44,11 @@ install_web_sdr() {
     return
   fi
 
-  if [ ! -w "$(dirname "$REPO_DIR")" ]; then
-    echo -e "${RED}Ошибка: Нет прав на запись в '$(dirname "$REPO_DIR")'. Пожалуйста, проверьте права доступа.${NC}"
+  echo -e "${YELLOW}Создание родительской директории для репозитория...${NC}"
+  sudo mkdir -p "$(dirname "$REPO_DIR")" || {
+    echo -e "${RED}Ошибка: Не удалось создать директорию '${REPO_DIR}'.${NC}"
     return 1
-  fi
+  }
 
   sudo apt-get update || { echo -e "${RED}Ошибка: Не удалось обновить список пакетов.${NC}"; return 1; }
   sudo apt-get install -y curl git ca-certificates || { echo -e "${RED}Ошибка: Не удалось установить зависимости.${NC}"; return 1; }
@@ -117,7 +118,6 @@ _EOF_
 
   echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
 }
-
 
 uninstall_web_sdr() {
   echo -e "${GREEN}=== Удаление всего для WEB SDR ===${NC}"
