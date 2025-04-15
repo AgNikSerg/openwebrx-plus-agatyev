@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e  
 
+exec < /dev/tty
+
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -13,7 +15,7 @@ is_curl_pipe_bash() {
   [[ "$(basename "$0")" == "bash" ]]
 }
 
-if is_curl_pipe_bash; then
+if [[ "$(basename "$0")" == "bash" ]]; then
   echo -e "${YELLOW}Скрипт запущен через curl. Устанавливаю его на диск...${NC}"
   
   SCRIPT_URL="https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh"
@@ -23,8 +25,7 @@ if is_curl_pipe_bash; then
   sudo chmod +x "$INSTALL_PATH" || { echo -e "${RED}Ошибка: Не удалось сделать скрипт исполняемым.${NC}"; exit 1; }
 
   echo -e "${GREEN}Скрипт успешно установлен. Запускаем его...${NC}"
-
-  exec "$INSTALL_PATH" "$@"
+  exec "$INSTALL_PATH"
 fi
 
 
