@@ -90,10 +90,25 @@ _EOF_
   echo -e "${YELLOW}Создание директорий для OpenWebRX...${NC}"
   sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
 
-  echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
-  git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; return 1; }
-  cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
-  echo -e "${GREEN}WEB SDR успешно установлен.${NC}"
+echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
+
+if [ -d "$REPO_DIR" ]; then
+  if [ -z "$(ls -A "$REPO_DIR")" ]; then
+    echo -e "${YELLOW}Директория '$REPO_DIR' существует, но пуста. Продолжаем клонирование...${NC}"
+  else
+    echo -e "${YELLOW}Директория '$REPO_DIR' существует и не пуста. Очищаем её...${NC}"
+    rm -rf "$REPO_DIR"
+  fi
+fi
+
+git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
+  echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; 
+  return 1; 
+}
+
+cd "$REPO_DIR" || { 
+  echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; 
+  return 1; 
 }
 
 uninstall_web_sdr() {
