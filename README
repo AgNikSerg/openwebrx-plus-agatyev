@@ -1,1 +1,5 @@
-curl -sSL https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh | bash
+Инструкция:
+1. Выполнить sudo -i 
+2. Выполнить curl -sSL https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh | bash
+3. В меню выбрать и подтвердить цифру 1 затем 3.
+
