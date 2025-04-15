@@ -87,29 +87,20 @@ blacklist msi2500
 blacklist hackrf
 _EOF_
 
-  echo -e "${YELLOW}Создание директорий для OpenWebRX...${NC}"
   sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
 
-  echo -e "${YELLOW}Клонирование репозитория OpenWebRX...${NC}"
-
   if [ -d "$REPO_DIR" ]; then
-    if [ -z "$(ls -A "$REPO_DIR")" ]; then
-      echo -e "${YELLOW}Директория '$REPO_DIR' существует, но пуста. Продолжаем клонирование...${NC}"
-    else
-      echo -e "${YELLOW}Директория '$REPO_DIR' существует и не пуста. Очищаем её...${NC}"
-      rm -rf "$REPO_DIR"
-    fi
+    rm -rf "$REPO_DIR" 
   fi
 
-  mkdir -p "$REPO_DIR"
-
+  mkdir -p "$REPO_DIR" 
   git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
     echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; 
     return 1; 
   }
 
   cd "$REPO_DIR" || { 
-    echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; 
+    echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория '${REPO_DIR}'.${NC}"; 
     return 1; 
   }
 
