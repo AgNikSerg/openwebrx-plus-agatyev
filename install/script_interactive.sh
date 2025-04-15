@@ -101,6 +101,7 @@ _EOF_
   fi
 
   echo -e "${YELLOW}Клонирую репозиторий в '$REPO_DIR'...${NC}"
+  cd / || { echo -e "${RED}Ошибка: Не удалось перейти в корневую директорию.${NC}"; return 1; }
   sudo -H git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
     echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; 
     return 1; 
