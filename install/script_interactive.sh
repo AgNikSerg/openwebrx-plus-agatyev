@@ -44,6 +44,11 @@ install_web_sdr() {
     return
   fi
 
+  if [ ! -w "$(dirname "$REPO_DIR")" ]; then
+    echo -e "${RED}Ошибка: Нет прав на запись в '$(dirname "$REPO_DIR")'. Пожалуйста, проверьте права доступа.${NC}"
+    return 1
+  fi
+
   sudo apt-get update || { echo -e "${RED}Ошибка: Не удалось обновить список пакетов.${NC}"; return 1; }
   sudo apt-get install -y curl git ca-certificates || { echo -e "${RED}Ошибка: Не удалось установить зависимости.${NC}"; return 1; }
 
@@ -90,14 +95,20 @@ _EOF_
   sudo mkdir -p /opt/owrx-docker/var /opt/owrx-docker/etc /opt/owrx-docker/plugins/receiver /opt/owrx-docker/plugins/map
 
   if [ -d "$REPO_DIR" ]; then
-    rm -rf "$REPO_DIR" 
+    echo -e "${YELLOW}Удаляю существующую директорию репозитория...${NC}"
+    sudo rm -rf "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось удалить существующую директорию репозитория.${NC}"; return 1; }
   fi
 
-  mkdir -p "$REPO_DIR" 
-  git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
+  echo -e "${YELLOW}Клонирую репозиторий в '$REPO_DIR'...${NC}"
+  sudo git clone https://github.com/AgNikSerg/openwebrx-plus-agatyev.git "$REPO_DIR" || { 
     echo -e "${RED}Ошибка: Не удалось клонировать репозиторий.${NC}"; 
     return 1; 
   }
+
+  if [ ! -d "$REPO_DIR/.git" ]; then
+    echo -e "${RED}Ошибка: Репозиторий не был успешно склонирован (отсутствует .git директория).${NC}"
+    return 1
+  fi
 
   cd "$REPO_DIR" || { 
     echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория '${REPO_DIR}'.${NC}"; 
@@ -137,7 +148,9 @@ uninstall_web_sdr() {
   sudo rm -f /etc/modprobe.d/owrx-blacklist.conf
 
   echo -e "${YELLOW}Удаление директорий OpenWebRX...${NC}"
-  sudo rm -rf /opt/owrx-docker openwebrx-plus-agatyev
+  sudo rm -rf /opt/owrx-docker || true
+  echo -e "${YELLOW}Удаляю директорию репозитория OpenWebRX...${NC}"
+  sudo rm -rf "$REPO_DIR" || { echo -e "${YELLOW}Предупреждение: Директория репозитория не найдена или уже удалена.${NC}"; }
 
   echo -e "${YELLOW}Удаление ключа Docker...${NC}"
   sudo rm -f /etc/apt/keyrings/docker.asc
@@ -157,14 +170,14 @@ start_web_sdr() {
     return
   fi
 
-if sudo docker ps | grep -q "openwebrx"; then
-  echo -e "${YELLOW}WEB SDR уже запущен:${NC}"
-  sudo docker ps --filter name=openwebrx
-  return
-fi
+  if sudo docker ps | grep -q "openwebrx"; then
+    echo -e "${YELLOW}WEB SDR уже запущен:${NC}"
+    sudo docker ps --filter name=openwebrx
+    return
+  fi
 
-  if [ ! -d "$REPO_DIR" ]; then
-    echo -e "${RED}Ошибка: Репозиторий OpenWebRX не найден.${NC}"
+  if [ ! -d "$REPO_DIR" ] || [ ! -d "$REPO_DIR/.git" ]; then
+    echo -e "${RED}Ошибка: Репозиторий OpenWebRX не найден или поврежден (отсутствует .git директория).${NC}"
     echo -e "${YELLOW}Пожалуйста, выполните шаг 1 для клонирования репозитория.${NC}"
     return
   fi
@@ -184,12 +197,12 @@ fi
 
 stop_web_sdr() {
   echo -e "${GREEN}=== Остановка WEB SDR ===${NC}"
-  if [ -d "$REPO_DIR" ]; then
+  if [ -d "$REPO_DIR" ] && [ -d "$REPO_DIR/.git" ]; then
     cd "$REPO_DIR" || { echo -e "${RED}Ошибка: Не удалось перейти в директорию репозитория.${NC}"; return 1; }
     sudo docker compose down || echo -e "${YELLOW}Предупреждение: Docker Compose уже остановлен.${NC}"
     echo -e "${GREEN}WEB SDR успешно остановлен.${NC}"
   else
-    echo -e "${RED}Ошибка: Репозиторий OpenWebRX не найден.${NC}"
+    echo -e "${RED}Ошибка: Репозиторий OpenWebRX не найден или поврежден (отсутствует .git директория).${NC}"
   fi
 }
 
