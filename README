@@ -3,3 +3,4 @@
 2. Выполнить curl -sSL https://raw.githubusercontent.com/AgNikSerg/openwebrx-plus-agatyev/main/install/script_interactive.sh | bash
 3. В меню выбрать и подтвердить цифру 1 затем 3.
 
+Тестирование пройдено на Ubuntu 24.04.2 LTS и на Linux Mint 22.1 Xia
